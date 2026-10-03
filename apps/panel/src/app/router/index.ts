@@ -7,7 +7,10 @@ import LoginPage from '@/pages/LoginPage.vue'
 import PlaceholderPage from '@/pages/PlaceholderPage.vue'
 import OccupancyMapPage from '@/pages/occupancy/OccupancyMapPage.vue'
 import OccupancyAvailabilityPage from '@/pages/occupancy/OccupancyAvailabilityPage.vue'
-import OccupancyArrivalsPage from '@/pages/occupancy/OccupancyArrivalsPage.vue'
+import ReservationsLayout from '@/layouts/ReservationsLayout.vue'
+import ReservationsArrivalsPage from '@/pages/reservations/ReservationsArrivalsPage.vue'
+import ReservationsParkedPage from '@/pages/reservations/ReservationsParkedPage.vue'
+import ReservationsHistoryPage from '@/pages/reservations/ReservationsHistoryPage.vue'
 import { homeRouteFor, navigation } from '@/layouts/navigation'
 
 declare module 'vue-router' {
@@ -23,12 +26,15 @@ declare module 'vue-router' {
 const pages: Record<string, Component> = {
   'occupancy-map': OccupancyMapPage,
   'occupancy-availability': OccupancyAvailabilityPage,
-  'occupancy-arrivals': OccupancyArrivalsPage,
+  'reservations-arrivals': ReservationsArrivalsPage,
+  'reservations-parked': ReservationsParkedPage,
+  'reservations-history': ReservationsHistoryPage,
 }
 
 // Contenedores de las secciones con submenú (estado compartido entre sus pantallas).
 const sectionLayouts: Record<string, Component> = {
   occupancy: OccupancyLayout,
+  reservations: ReservationsLayout,
 }
 
 const sectionRoutes: RouteRecordRaw[] = navigation.flatMap((section) =>

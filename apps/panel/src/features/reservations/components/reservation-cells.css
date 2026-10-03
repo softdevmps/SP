@@ -1,0 +1,54 @@
+/* Celdas comunes de las tablas de reservas */
+.slot {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.slot strong {
+  font-size: 14px;
+}
+
+.slot span,
+.muted {
+  color: var(--sp-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.driver {
+  font-weight: 600;
+}
+
+.plate {
+  padding: 2px 7px;
+  border: 1px solid var(--sp-border-strong);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.mono {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  color: var(--sp-text-muted);
+}
+
+.money {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.money.is-live {
+  color: #f08a8d;
+}
+
+:deep(tr.is-waiting td:first-child) {
+  box-shadow: inset 3px 0 0 var(--sp-warning);
+}
+
+:deep(tr.is-overstay td:first-child) {
+  box-shadow: inset 3px 0 0 var(--sp-occupied);
+}

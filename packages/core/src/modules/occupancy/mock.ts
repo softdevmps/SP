@@ -1,5 +1,5 @@
 import type { Lot } from '../lots'
-import type { Reservation } from '../reservations'
+import { calculateOverstay, type Reservation } from '../reservations'
 import type { OccupancyEvent, OccupancySince, OccupancySnapshot, SpaceStatus } from './types'
 
 // MOCK: datos de una playa de ejemplo y simulación de sensores. Se reemplaza por la API
@@ -15,6 +15,7 @@ export function buildMockLot(): Lot {
     id: 'lot-centro',
     name: 'Playa Centro',
     address: 'Av. Colón 1234, Córdoba',
+    overstayTariff: { pricePerHour: 2000, fractionMinutes: 15 },
     floors: Array.from({ length: FLOORS }, (_, floorIndex) => ({
       id: `f${floorIndex + 1}`,
       name: `Piso ${floorIndex + 1}`,
@@ -104,7 +105,7 @@ export function buildMockReservations(lotId: string): Reservation[] {
     ])
   }
 
-  return rows.map(([code, driverName, vehiclePlate, start, end], index) => ({
+  const pending: Reservation[] = rows.map(([code, driverName, vehiclePlate, start, end], index) => ({
     id: `r${index + 1}`,
     code,
     lotId,
@@ -114,6 +115,45 @@ export function buildMockReservations(lotId: string): Reservation[] {
     endsAt: at(end),
     status: 'pending',
   }))
+
+  // Reservas de más temprano: autos en la playa (algunos pasados de su franja),
+  // salidas ya registradas y un conductor que no se presentó.
+  // [código, conductor, patente, inicio, fin, llegada, salida] en minutos desde ahora
+  const earlier: Array<[string, string, string, number, number, number | null, number | null]> = [
+    ['SP-1R5V', 'Agustina Medina', 'AE 640 TC', -150, -30, -146, null],
+    ['SP-8N2G', 'Hernán Quiroga', 'AC 512 WH', -125, -10, -118, null],
+    ['SP-4D7S', 'Rocío Bustos', 'AF 207 KM', -90, 30, -88, null],
+    ['SP-2P9L', 'Matías Luna', 'AD 381 ZP', -60, 60, -55, null],
+    ['SP-7C3J', 'Florencia Vera', 'AB 925 GN', -45, 75, -40, null],
+    ['SP-5V8E', 'Pablo Correa', 'AG 154 DR', -300, -180, -296, -150],
+    ['SP-3L6H', 'Daniela Suárez', 'AE 733 XT', -260, -140, -255, -142],
+    ['SP-9A4W', 'Gustavo Ibarra', 'AC 869 FB', -240, -120, -232, -97],
+    ['SP-6Z1Q', 'Lorena Pereyra', 'AF 498 SN', -200, -80, null, null],
+  ]
+
+  const tariff = { pricePerHour: 2000, fractionMinutes: 15 }
+  const past: Reservation[] = earlier.map(
+    ([code, driverName, vehiclePlate, start, end, arrival, exit], index) => {
+      const reservation: Reservation = {
+        id: `rp${index + 1}`,
+        code,
+        lotId,
+        driverName,
+        vehiclePlate,
+        startsAt: at(start),
+        endsAt: at(end),
+        status: arrival === null ? 'pending' : exit === null ? 'checked_in' : 'completed',
+      }
+      if (arrival !== null) reservation.checkedInAt = at(arrival)
+      if (exit !== null) {
+        reservation.checkedOutAt = at(exit)
+        reservation.overstay = calculateOverstay(reservation, at(exit), tariff)
+      }
+      return reservation
+    },
+  )
+
+  return [...past, ...pending]
 }
 
 /** Cambia al azar el estado de una cochera cada tantos segundos, como harían los sensores. */

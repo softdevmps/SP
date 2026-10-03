@@ -56,3 +56,54 @@ button {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* Botones */
+.btn {
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid var(--sp-border-strong);
+  border-radius: var(--sp-radius-sm);
+  background: var(--sp-surface-2);
+  color: var(--sp-text);
+  font: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--sp-duration) var(--sp-ease),
+    border-color var(--sp-duration) var(--sp-ease);
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--sp-surface-3);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  border-color: rgb(255 255 255 / 0.08);
+  background: var(--sp-accent);
+  color: #fff;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--sp-accent-hover);
+}
+
+.btn--sm {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.btn--subtle:hover:not(:disabled) {
+  border-color: rgb(155 31 48 / 0.6);
+  background: var(--sp-accent-soft);
+}

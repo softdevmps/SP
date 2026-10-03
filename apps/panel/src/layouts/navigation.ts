@@ -47,10 +47,19 @@ export const navigation: NavSection[] = [
         children: [
           { name: 'occupancy-map', label: 'Mapa de la playa', to: '/ocupacion/mapa' },
           { name: 'occupancy-availability', label: 'Disponibilidad', to: '/ocupacion/disponibilidad' },
-          { name: 'occupancy-arrivals', label: 'Próximas llegadas', to: '/ocupacion/llegadas' },
         ],
       },
-      { name: 'reservations', label: 'Reservas', to: '/reservas', icon: CalendarClock },
+      {
+        name: 'reservations',
+        label: 'Reservas',
+        to: '/reservas',
+        icon: CalendarClock,
+        children: [
+          { name: 'reservations-arrivals', label: 'Llegadas', to: '/reservas/llegadas' },
+          { name: 'reservations-parked', label: 'En la playa', to: '/reservas/en-la-playa' },
+          { name: 'reservations-history', label: 'Historial', to: '/reservas/historial' },
+        ],
+      },
     ],
   },
   {

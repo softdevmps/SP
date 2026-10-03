@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Lot } from '../lots'
-import type { Reservation } from '../reservations'
+import { calculateOverstay, type Reservation } from '../reservations'
 import {
   buildMockEvents,
   buildMockLot,
@@ -120,9 +120,13 @@ export const useOccupancyStore = defineStore('occupancy', () => {
     return 'ok'
   })
 
+  /** Reservas que todavía pueden llegar (excluye las que ya terminaron sin presentarse). */
   const upcomingReservations = computed(() =>
     reservations.value
-      .filter((reservation) => reservation.status === 'pending')
+      .filter(
+        (reservation) =>
+          reservation.status === 'pending' && new Date(reservation.endsAt).getTime() > now.value,
+      )
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
   )
 
@@ -137,6 +141,16 @@ export const useOccupancyStore = defineStore('occupancy', () => {
     return reservations.value.find((reservation) => reservation.code === normalized)
   }
 
+  /** MOCK: registra la salida y el excedente cobrado. Con backend será POST /reservations/:id/check-out. */
+  function checkOut(reservationId: string) {
+    const reservation = reservations.value.find((candidate) => candidate.id === reservationId)
+    if (!reservation || reservation.status !== 'checked_in' || !lot.value) return
+    const exitAt = new Date()
+    reservation.status = 'completed'
+    reservation.checkedOutAt = exitAt.toISOString()
+    reservation.overstay = calculateOverstay(reservation, exitAt, lot.value.overstayTariff)
+  }
+
   /** MOCK: marca la llegada localmente. Con backend será POST /reservations/:id/check-in. */
   function checkIn(reservationId: string) {
     const reservation = reservations.value.find((candidate) => candidate.id === reservationId)
@@ -145,14 +159,13 @@ export const useOccupancyStore = defineStore('occupancy', () => {
     reservation.checkedInAt = new Date().toISOString()
   }
 
+  /**
+   * Carga la playa (una sola vez) y arranca las actualizaciones en vivo. Las distintas
+   * pantallas comparten el mismo estado: salir de una solo pausa el feed.
+   */
   function connect() {
-    disconnect()
-    lot.value = buildMockLot()
-    snapshot.value = buildMockSnapshot(lot.value)
-    since.value = buildMockSince(snapshot.value)
-    events.value = buildMockEvents(snapshot.value, since.value)
-    reservations.value = buildMockReservations(lot.value.id)
-    lastUpdate.value = new Date()
+    if (stopFeed) return
+    if (!lot.value) load()
     now.value = Date.now()
     clockTimer = setInterval(() => (now.value = Date.now()), 15_000)
 
@@ -167,6 +180,15 @@ export const useOccupancyStore = defineStore('occupancy', () => {
       lastChangedSpaceId.value = spaceId
       lastUpdate.value = at
     })
+  }
+
+  function load() {
+    lot.value = buildMockLot()
+    snapshot.value = buildMockSnapshot(lot.value)
+    since.value = buildMockSince(snapshot.value)
+    events.value = buildMockEvents(snapshot.value, since.value)
+    reservations.value = buildMockReservations(lot.value.id)
+    lastUpdate.value = new Date()
   }
 
   function disconnect() {
@@ -193,6 +215,8 @@ export const useOccupancyStore = defineStore('occupancy', () => {
     checkedInToday,
     findByCode,
     checkIn,
+    checkOut,
+    reservations,
     lastUpdate,
     lastChangedSpaceId,
     connect,
