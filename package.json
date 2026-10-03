@@ -2,7 +2,7 @@
   "name": "sp",
   "private": true,
   "scripts": {
-    "dev:desktop": "pnpm --filter @sp/desktop dev",
+    "dev:panel": "pnpm --filter @sp/panel dev",
     "dev:mobile": "pnpm --filter @sp/mobile dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
