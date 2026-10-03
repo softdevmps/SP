@@ -11,3 +11,7 @@ coverage/
 
 # Documentación interna (no se versiona)
 docs/
+
+# Especificaciones internas del backend (no se versionan)
+backend/BackendTODO.md
+backend/SQLTODO.md

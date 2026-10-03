@@ -2,12 +2,13 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ChevronDown } from 'lucide-vue-next'
-import { useAuthStore } from '@sp/core'
+import { useAuthStore, useChatStore } from '@sp/core'
 import { navigation, type NavItem } from '../navigation'
 
 defineProps<{ open: boolean }>()
 
 const auth = useAuthStore()
+const chat = useChatStore()
 const route = useRoute()
 const router = useRouter()
 
@@ -16,6 +17,11 @@ const visibleSections = computed(() =>
 )
 
 const expanded = ref<string[]>([])
+
+function badgeOf(item: NavItem): number {
+  if (item.badge === 'chat-unread') return chat.totalUnread
+  return 0
+}
 
 function isWithin(item: NavItem) {
   return route.path === item.to || route.path.startsWith(`${item.to}/`)
@@ -93,6 +99,7 @@ function onParentClick(item: NavItem) {
                 <component :is="item.icon" :size="18" :stroke-width="1.8" />
               </span>
               <span class="sidebar__label">{{ item.label }}</span>
+              <span v-if="badgeOf(item)" class="sidebar__badge">{{ badgeOf(item) }}</span>
             </RouterLink>
           </li>
         </ul>
@@ -219,6 +226,19 @@ function onParentClick(item: NavItem) {
   border-color: transparent;
   color: #fff;
   box-shadow: 0 0 16px -2px rgb(155 31 48 / 0.7);
+}
+
+.sidebar__badge {
+  min-width: 22px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--sp-accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .sidebar__chevron {

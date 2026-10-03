@@ -26,7 +26,7 @@ Sp/
 │   │           ├── devices/           # sensores, mapeo sensor→cochera, alertas de hardware
 │   │           ├── reports/           # ocupación, ingresos/egresos, rotación, recaudación
 │   │           ├── staff/             # playeros de la playa
-│   │           ├── chat/              # burbuja flotante + bandeja de mensajes con conductores
+│   │           ├── chat/              # chat del header + pantalla Mensajes con conductores
 │   │           ├── admin-lots/        # (plataforma) alta de playas, dueños, suscripciones
 │   │           └── admin-settlements/ # (plataforma) pagos recibidos y liquidaciones
 │   │

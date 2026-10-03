@@ -1,6 +1,10 @@
-const timeFormatter = new Intl.DateTimeFormat('es-AR', { hour: '2-digit', minute: '2-digit' })
+const timeFormatter = new Intl.DateTimeFormat('es-AR', {
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+})
 
-/** "14:30" */
+/** "14:30" (24 h, sin "a. m.") */
 export function formatTime(value: string | Date): string {
   return timeFormatter.format(typeof value === 'string' ? new Date(value) : value)
 }

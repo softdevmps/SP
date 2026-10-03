@@ -9,6 +9,7 @@ import {
   Cpu,
   LayoutDashboard,
   LayoutGrid,
+  MessageCircle,
   Settings,
   UserCog,
   Users,
@@ -25,6 +26,8 @@ export interface NavItem extends NavLeaf {
   icon: Component
   /** Subsecciones: el ítem se despliega en el sidebar y redirige a la primera. */
   children?: NavLeaf[]
+  /** Contador a mostrar al lado del ítem. */
+  badge?: 'chat-unread'
 }
 
 export interface NavSection {
@@ -60,6 +63,13 @@ export const navigation: NavSection[] = [
           { name: 'reservations-history', label: 'Historial', to: '/reservas/historial' },
         ],
       },
+    ],
+  },
+  {
+    title: 'Comunicación',
+    roles: ['attendant', 'owner'],
+    items: [
+      { name: 'messages', label: 'Mensajes', to: '/mensajes', icon: MessageCircle, badge: 'chat-unread' },
     ],
   },
   {

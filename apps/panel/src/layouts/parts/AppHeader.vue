@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import UserMenu from './UserMenu.vue'
+import HeaderChat from '@/features/chat/components/HeaderChat.vue'
 
-defineProps<{ sidebarOpen: boolean }>()
+defineProps<{ sidebarOpen: boolean; showChat?: boolean }>()
 defineEmits<{ toggleSidebar: [] }>()
 </script>
 
@@ -27,6 +28,7 @@ defineEmits<{ toggleSidebar: [] }>()
     </RouterLink>
 
     <div class="header__actions">
+      <HeaderChat v-if="showChat" />
       <UserMenu />
     </div>
   </header>
@@ -144,7 +146,7 @@ defineEmits<{ toggleSidebar: [] }>()
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 @media (max-width: 480px) {

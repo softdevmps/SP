@@ -1,13 +1,20 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import AppHeader from './parts/AppHeader.vue'
 import AppSidebar from './parts/AppSidebar.vue'
 import ToastHost from '@/components/ToastHost.vue'
 import { useSidebar } from './composables/useSidebar'
+import { useAuthStore } from '@sp/core'
+import { useChatLive } from '@/features/chat/composables/useChatLive'
 
 const { isOpen, isDesktop, toggle, closeOverlay } = useSidebar()
 const route = useRoute()
+const auth = useAuthStore()
+
+// El chat con conductores es de la playa: lo usan playeros y dueños, no el admin de plataforma.
+const hasChat = computed(() => auth.user?.role === 'attendant' || auth.user?.role === 'owner')
+if (hasChat.value) useChatLive()
 
 // En modo drawer, navegar o apretar Escape cierra el sidebar.
 watch(() => route.fullPath, closeOverlay)
@@ -22,7 +29,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 
 <template>
   <div class="panel" :class="{ 'is-pushed': isOpen && isDesktop }">
-    <AppHeader :sidebar-open="isOpen" @toggle-sidebar="toggle" />
+    <AppHeader :sidebar-open="isOpen" :show-chat="hasChat" @toggle-sidebar="toggle" />
     <AppSidebar :open="isOpen" />
 
     <Transition name="backdrop">

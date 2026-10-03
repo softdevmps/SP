@@ -8,6 +8,7 @@ import PlaceholderPage from '@/pages/PlaceholderPage.vue'
 import OccupancyMapPage from '@/pages/occupancy/OccupancyMapPage.vue'
 import OccupancyAvailabilityPage from '@/pages/occupancy/OccupancyAvailabilityPage.vue'
 import ReservationsLayout from '@/layouts/ReservationsLayout.vue'
+import MessagesPage from '@/pages/MessagesPage.vue'
 import ReservationsArrivalsPage from '@/pages/reservations/ReservationsArrivalsPage.vue'
 import ReservationsParkedPage from '@/pages/reservations/ReservationsParkedPage.vue'
 import ReservationsHistoryPage from '@/pages/reservations/ReservationsHistoryPage.vue'
@@ -29,6 +30,7 @@ const pages: Record<string, Component> = {
   'reservations-arrivals': ReservationsArrivalsPage,
   'reservations-parked': ReservationsParkedPage,
   'reservations-history': ReservationsHistoryPage,
+  messages: MessagesPage,
 }
 
 // Contenedores de las secciones con submenú (estado compartido entre sus pantallas).
