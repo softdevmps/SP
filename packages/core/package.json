@@ -1,0 +1,13 @@
+{
+  "name": "@sp/core",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "pinia": "^4.0.3",
+    "vue": "^3.5.43"
+  }
+}

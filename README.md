@@ -26,6 +26,7 @@ Sp/
 │   │           ├── devices/           # sensores, mapeo sensor→cochera, alertas de hardware
 │   │           ├── reports/           # ocupación, ingresos/egresos, rotación, recaudación
 │   │           ├── staff/             # playeros de la playa
+│   │           ├── chat/              # burbuja flotante + bandeja de mensajes con conductores
 │   │           ├── admin-lots/        # (plataforma) alta de playas, dueños, suscripciones
 │   │           └── admin-settlements/ # (plataforma) pagos recibidos y liquidaciones
 │   │
@@ -38,6 +39,7 @@ Sp/
 │               ├── lot-detail/        # ficha de la playa, disponibilidad, precios
 │               ├── booking/           # franja + duración → pago Mercado Pago → confirmación
 │               ├── tickets/           # ticket/código de la reserva, reserva activa, historial
+│               ├── chat/              # mensajes con la playa
 │               ├── vehicles/          # vehículos y patentes
 │               ├── profile/
 │               └── notifications/     # push
@@ -49,7 +51,7 @@ Sp/
 │   │       ├── realtime/         # WebSocket/SSE para ocupación en vivo
 │   │       ├── modules/          # un módulo por dominio: types + service (API) + store (Pinia)
 │   │       │   ├── auth/  users/  lots/  occupancy/  reservations/  tickets/
-│   │       │   └── payments/  vehicles/  devices/  reports/  settlements/
+│   │       │   └── payments/  vehicles/  devices/  reports/  settlements/  chat/
 │   │       └── shared/           # utils/, constants/, validations/, types/
 │   ├── ui/                       # @sp/ui — design tokens y componentes base compartidos
 │   └── config/                   # tsconfig y eslint base

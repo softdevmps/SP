@@ -1,0 +1,54 @@
+/*
+ * Design tokens SP — tema oscuro gótico, sobrio y profesional.
+ * Negros profundos con un único acento: rojo sangre oscuro (oxblood). Sin rosados.
+ */
+:root {
+  color-scheme: dark;
+
+  /* Superficies (de más profunda a más elevada) */
+  --sp-bg: #0a090a;
+  --sp-surface: #121113;
+  --sp-surface-2: #19171a;
+  --sp-surface-3: #221f23;
+  --sp-border: rgb(255 255 255 / 0.07);
+  --sp-border-strong: rgb(255 255 255 / 0.13);
+
+  /* Texto */
+  --sp-text: #ebe7e5;
+  --sp-text-muted: #a29b99;
+  --sp-text-faint: #6c6567;
+
+  /* Acento */
+  --sp-accent: #9b1f30;          /* oxblood */
+  --sp-accent-hover: #b02536;
+  --sp-accent-deep: #6e1421;     /* vino, para degradés y bordes */
+  --sp-accent-soft: rgb(155 31 48 / 0.16);
+  --sp-gradient-accent: linear-gradient(135deg, #a8233a 0%, #6e1421 100%);
+  --sp-gradient-surface: linear-gradient(160deg, rgb(255 255 255 / 0.035), rgb(255 255 255 / 0.01));
+
+  /* Estados de cochera */
+  --sp-free: #34c482;
+  --sp-occupied: #e5484d;
+  --sp-warning: #e2a336;
+  --sp-danger: #e5484d;
+
+  /* Tipografía */
+  --sp-font-body: 'Plus Jakarta Sans Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sp-font-display: 'Outfit Variable', 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+
+  /* Forma */
+  --sp-radius-sm: 8px;
+  --sp-radius: 12px;
+  --sp-radius-lg: 18px;
+
+  /* Sombras y brillos */
+  --sp-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.5);
+  --sp-shadow: 0 2px 6px rgb(0 0 0 / 0.4), 0 12px 32px -10px rgb(0 0 0 / 0.75);
+  --sp-shadow-lg: 0 4px 12px rgb(0 0 0 / 0.45), 0 30px 70px -20px rgb(0 0 0 / 0.85);
+  --sp-glow-accent: 0 0 0 1px rgb(155 31 48 / 0.35), 0 8px 24px -8px rgb(155 31 48 / 0.55);
+  --sp-inner-highlight: inset 0 1px 0 rgb(255 255 255 / 0.06);
+
+  /* Movimiento */
+  --sp-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --sp-duration: 220ms;
+}
