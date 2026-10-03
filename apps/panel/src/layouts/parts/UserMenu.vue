@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ChevronDown, LogOut } from 'lucide-vue-next'
+import { ChevronDown, KeyRound, LogOut } from 'lucide-vue-next'
 import { useAuthStore, type UserRole } from '@sp/core'
 
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -69,7 +69,11 @@ onBeforeUnmount(() => {
           <span>@{{ auth.user.username }}</span>
           <span class="role">{{ ROLE_LABELS[auth.user.role] }}</span>
         </div>
-        <button type="button" class="dropdown__item" role="menuitem" @click="logout">
+        <RouterLink :to="{ name: 'change-password' }" class="dropdown__item" role="menuitem" @click="open = false">
+          <KeyRound :size="16" />
+          Cambiar contraseña
+        </RouterLink>
+        <button type="button" class="dropdown__item is-danger" role="menuitem" @click="logout">
           <LogOut :size="16" />
           Cerrar sesión
         </button>
@@ -189,6 +193,11 @@ onBeforeUnmount(() => {
 }
 
 .dropdown__item:hover {
+  color: var(--sp-text);
+  background: var(--sp-surface-3);
+}
+
+.dropdown__item.is-danger:hover {
   color: var(--sp-danger);
   background: rgb(229 72 77 / 0.08);
 }

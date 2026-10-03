@@ -30,9 +30,13 @@ export function calculateOverstay(
 ): OverstayCharge {
   const exit = new Date(exitAt).getTime()
   const minutes = Math.max(0, Math.ceil((exit - new Date(reservation.endsAt).getTime()) / 60_000))
-  if (minutes === 0) return { minutes: 0, amount: 0 }
+  return { minutes, amount: overstayAmount(minutes, tariff) }
+}
 
+/** Monto por una cantidad de minutos excedidos: fracciones completas, redondeando hacia arriba. */
+export function overstayAmount(minutes: number, tariff: OverstayTariff): number {
+  if (minutes <= 0) return 0
   const fractions = Math.ceil(minutes / tariff.fractionMinutes)
   const pricePerFraction = (tariff.pricePerHour * tariff.fractionMinutes) / 60
-  return { minutes, amount: Math.round(fractions * pricePerFraction) }
+  return Math.round(fractions * pricePerFraction)
 }

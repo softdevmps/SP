@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import * as authService from './service'
-import type { LoginCredentials, Session } from './types'
+import type { LoginCredentials, PasswordChange, Session } from './types'
 
 const STORAGE_KEY = 'sp.session.v2'
 
@@ -34,10 +34,17 @@ export const useAuthStore = defineStore('auth', () => {
     storeSession(session.value)
   }
 
+  async function changePassword(change: PasswordChange) {
+    if (!session.value) return
+    const user = await authService.changePassword(session.value.user, change)
+    session.value = { ...session.value, user }
+    storeSession(session.value)
+  }
+
   function logout() {
     session.value = null
     storeSession(null)
   }
 
-  return { user, isAuthenticated, login, logout }
+  return { user, isAuthenticated, login, logout, changePassword }
 })

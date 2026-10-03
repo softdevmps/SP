@@ -23,6 +23,14 @@ function badgeOf(item: NavItem): number {
   return 0
 }
 
+const activeLeafTo = computed(() => {
+  const candidates = visibleSections.value
+    .flatMap((section) => section.items)
+    .filter((item) => !item.children && (route.path === item.to || route.path.startsWith(`${item.to}/`)))
+    .map((item) => item.to)
+  return candidates.sort((a, b) => b.length - a.length)[0] ?? null
+})
+
 function isWithin(item: NavItem) {
   return route.path === item.to || route.path.startsWith(`${item.to}/`)
 }
@@ -94,7 +102,12 @@ function onParentClick(item: NavItem) {
               </ul>
             </template>
 
-            <RouterLink v-else :to="item.to" class="sidebar__link" active-class="is-active">
+            <RouterLink
+              v-else
+              :to="item.to"
+              class="sidebar__link"
+              :class="{ 'is-active': item.to === activeLeafTo }"
+            >
               <span class="sidebar__icon">
                 <component :is="item.icon" :size="18" :stroke-width="1.8" />
               </span>

@@ -14,6 +14,7 @@ defineProps<{ title?: string }>()
 
 <style scoped>
 .card {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   padding: 20px;

@@ -29,3 +29,10 @@ export function formatAgo(value: string | Date, now = Date.now()): string {
   const minutes = -minutesUntil(value, now)
   return minutes < 1 ? 'hace instantes' : `hace ${formatDuration(minutes)}`
 }
+
+const dateFormatter = new Intl.DateTimeFormat('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+
+/** "03/10/2026" */
+export function formatDate(value: string | Date): string {
+  return dateFormatter.format(typeof value === 'string' ? new Date(value) : value)
+}

@@ -1,3 +1,3 @@
 export * from './types'
-export { AuthError } from './service'
+export { AuthError, passwordChecks } from './service'
 export { useAuthStore } from './store'

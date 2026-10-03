@@ -90,10 +90,10 @@ export const navigation: NavSection[] = [
     items: [
       { name: 'platform-summary', label: 'Resumen', to: '/plataforma', icon: LayoutDashboard },
       { name: 'admin-lots', label: 'Playas', to: '/plataforma/playas', icon: Building2 },
+      { name: 'admin-monitoring', label: 'Monitoreo', to: '/plataforma/monitoreo', icon: Activity },
       { name: 'admin-users', label: 'Usuarios', to: '/plataforma/usuarios', icon: UserCog },
       { name: 'admin-payments', label: 'Pagos', to: '/plataforma/pagos', icon: CreditCard },
       { name: 'admin-settlements', label: 'Liquidaciones', to: '/plataforma/liquidaciones', icon: Wallet },
-      { name: 'admin-monitoring', label: 'Monitoreo', to: '/plataforma/monitoreo', icon: Activity },
     ],
   },
 ]

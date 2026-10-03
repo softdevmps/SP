@@ -27,8 +27,10 @@ Sp/
 │   │           ├── reports/           # ocupación, ingresos/egresos, rotación, recaudación
 │   │           ├── staff/             # playeros de la playa
 │   │           ├── chat/              # chat del header + pantalla Mensajes con conductores
-│   │           ├── admin-lots/        # (plataforma) alta de playas, dueños, suscripciones
-│   │           └── admin-settlements/ # (plataforma) pagos recibidos y liquidaciones
+│   │           ├── admin-lots/        # (admin) playas: alta, estados y ficha de cada playa
+│   │           ├── admin-hardware/    # (admin) equipos, sensores, comandos, monitoreo y alertas
+│   │           ├── admin-users/       # (admin) cuentas de dueños, playeros y admins
+│   │           └── admin-finance/     # (admin) pagos de reservas y liquidaciones
 │   │
 │   └── mobile/                   # App de conductores (Vue 3 + Capacitor) — Play Store / App Store
 │       └── src/
@@ -49,9 +51,9 @@ Sp/
 │   │   └── src/
 │   │       ├── http/             # cliente HTTP, auth headers, manejo de errores
 │   │       ├── realtime/         # WebSocket/SSE para ocupación en vivo
-│   │       ├── modules/          # un módulo por dominio: types + service (API) + store (Pinia)
-│   │       │   ├── auth/  users/  lots/  occupancy/  reservations/  tickets/
-│   │       │   └── payments/  vehicles/  devices/  reports/  settlements/  chat/
+│   │       ├── modules/          # un módulo por dominio: types + store (Pinia) + mock hasta tener API
+│   │       │   ├── auth/  accounts/  lots/  occupancy/  reservations/  chat/
+│   │       │   └── platform/  hardware/  payments/   (+ tickets, vehicles, reports: etapa mobile/dueño)
 │   │       └── shared/           # utils/, constants/, validations/, types/
 │   ├── ui/                       # @sp/ui — design tokens y componentes base compartidos
 │   └── config/                   # tsconfig y eslint base

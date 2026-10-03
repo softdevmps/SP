@@ -2,7 +2,7 @@
 import { onMounted, ref, watch } from 'vue'
 import { X } from 'lucide-vue-next'
 
-defineProps<{ title: string }>()
+withDefaults(defineProps<{ title: string; size?: 'md' | 'lg' }>(), { size: 'md' })
 const open = defineModel<boolean>('open', { default: false })
 
 // <dialog> nativo: ya resuelve foco atrapado, Escape y capa superior.
@@ -27,6 +27,7 @@ function onBackdropClick(event: MouseEvent) {
   <dialog
     ref="dialog"
     class="dialog"
+    :class="`is-${size}`"
     :aria-label="title"
     @close="open = false"
     @click="onBackdropClick"
@@ -53,6 +54,10 @@ function onBackdropClick(event: MouseEvent) {
   background: var(--sp-surface);
   color: var(--sp-text);
   box-shadow: var(--sp-shadow-lg), var(--sp-inner-highlight);
+}
+
+.dialog.is-lg {
+  width: min(640px, calc(100vw - 32px));
 }
 
 .dialog[open] {

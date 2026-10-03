@@ -197,7 +197,9 @@ function ariaSort(column: DataTableColumn<T>) {
 </template>
 
 <style scoped>
+/* min-width: 0 → dentro de una grilla la tabla no empuja el ancho; se desplaza adentro de .scroll */
 .table-card {
+  min-width: 0;
   border: 1px solid var(--sp-border);
   border-radius: var(--sp-radius);
   background: var(--sp-surface);

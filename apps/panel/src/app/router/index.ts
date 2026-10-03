@@ -4,11 +4,25 @@ import { useAuthStore, type UserRole } from '@sp/core'
 import PanelLayout from '@/layouts/PanelLayout.vue'
 import OccupancyLayout from '@/layouts/OccupancyLayout.vue'
 import LoginPage from '@/pages/LoginPage.vue'
+import ChangePasswordPage from '@/pages/ChangePasswordPage.vue'
 import PlaceholderPage from '@/pages/PlaceholderPage.vue'
 import OccupancyMapPage from '@/pages/occupancy/OccupancyMapPage.vue'
 import OccupancyAvailabilityPage from '@/pages/occupancy/OccupancyAvailabilityPage.vue'
 import ReservationsLayout from '@/layouts/ReservationsLayout.vue'
 import MessagesPage from '@/pages/MessagesPage.vue'
+import PlatformLotsPage from '@/pages/platform/PlatformLotsPage.vue'
+import PlatformSummaryPage from '@/pages/platform/PlatformSummaryPage.vue'
+import PlatformUsersPage from '@/pages/platform/PlatformUsersPage.vue'
+import PlatformPaymentsPage from '@/pages/platform/PlatformPaymentsPage.vue'
+import PlatformSettlementsPage from '@/pages/platform/PlatformSettlementsPage.vue'
+import PlatformMonitoringPage from '@/pages/platform/PlatformMonitoringPage.vue'
+import PlatformLotLayout from '@/layouts/PlatformLotLayout.vue'
+import LotInfoPage from '@/pages/platform/lot/LotInfoPage.vue'
+import LotLayoutPage from '@/pages/platform/lot/LotLayoutPage.vue'
+import LotDevicesPage from '@/pages/platform/lot/LotDevicesPage.vue'
+import LotSensorsPage from '@/pages/platform/lot/LotSensorsPage.vue'
+import LotSettingsPage from '@/pages/platform/lot/LotSettingsPage.vue'
+import LotLivePage from '@/pages/platform/lot/LotLivePage.vue'
 import ReservationsArrivalsPage from '@/pages/reservations/ReservationsArrivalsPage.vue'
 import ReservationsParkedPage from '@/pages/reservations/ReservationsParkedPage.vue'
 import ReservationsHistoryPage from '@/pages/reservations/ReservationsHistoryPage.vue'
@@ -31,6 +45,12 @@ const pages: Record<string, Component> = {
   'reservations-parked': ReservationsParkedPage,
   'reservations-history': ReservationsHistoryPage,
   messages: MessagesPage,
+  'platform-summary': PlatformSummaryPage,
+  'admin-lots': PlatformLotsPage,
+  'admin-users': PlatformUsersPage,
+  'admin-payments': PlatformPaymentsPage,
+  'admin-settlements': PlatformSettlementsPage,
+  'admin-monitoring': PlatformMonitoringPage,
 }
 
 // Contenedores de las secciones con submenú (estado compartido entre sus pantallas).
@@ -80,6 +100,12 @@ export const router = createRouter({
       meta: { title: 'Ingresar', guestOnly: true },
     },
     {
+      path: '/cambiar-contrasena',
+      name: 'change-password',
+      component: ChangePasswordPage,
+      meta: { title: 'Cambiar contraseña', requiresAuth: true },
+    },
+    {
       path: '/',
       component: PanelLayout,
       meta: { requiresAuth: true },
@@ -90,6 +116,21 @@ export const router = createRouter({
           redirect: () => ({ name: homeRouteFor(useAuthStore().user?.role ?? 'attendant') }),
         },
         ...sectionRoutes,
+        // Ficha de una playa (admin de plataforma): configuración y hardware.
+        {
+          path: 'plataforma/playas/:lotId',
+          component: PlatformLotLayout,
+          meta: { roles: ['platform_admin'] },
+          children: [
+            { path: '', name: 'admin-lot', redirect: { name: 'admin-lot-info' } },
+            { path: 'informacion', name: 'admin-lot-info', component: LotInfoPage, meta: { title: 'Playa · Información' } },
+            { path: 'plano', name: 'admin-lot-layout', component: LotLayoutPage, meta: { title: 'Playa · Plano' } },
+            { path: 'tarifas', name: 'admin-lot-settings', component: LotSettingsPage, meta: { title: 'Playa · Tarifas y horarios' } },
+            { path: 'equipos', name: 'admin-lot-devices', component: LotDevicesPage, meta: { title: 'Playa · Equipos' } },
+            { path: 'sensores', name: 'admin-lot-sensors', component: LotSensorsPage, meta: { title: 'Playa · Sensores' } },
+            { path: 'en-vivo', name: 'admin-lot-live', component: LotLivePage, meta: { title: 'Playa · Estado en vivo' } },
+          ],
+        },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/' },
@@ -103,7 +144,11 @@ router.beforeEach((to) => {
     return { name: 'login', query: to.fullPath === '/' ? {} : { redirect: to.fullPath } }
   }
   if (to.meta.guestOnly && auth.isAuthenticated) {
-    return { name: 'home' }
+    return { name: auth.user?.mustChangePassword ? 'change-password' : 'home' }
+  }
+  // Con contraseña temporal no se puede usar el panel hasta cambiarla.
+  if (auth.user?.mustChangePassword && to.name !== 'change-password') {
+    return { name: 'change-password' }
   }
   // Cada rol solo entra a sus secciones, aunque escriba la URL a mano.
   if (to.meta.roles && auth.user && !to.meta.roles.includes(auth.user.role)) {
