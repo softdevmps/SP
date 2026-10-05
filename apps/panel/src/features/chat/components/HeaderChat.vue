@@ -2,7 +2,7 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { Maximize2, MessageCircle, Volume2, VolumeX, X } from 'lucide-vue-next'
-import { useChatStore } from '@sp/core'
+import { useActiveLotStore, useChatStore } from '@sp/core'
 import ConversationList from './ConversationList.vue'
 import ChatThread from './ChatThread.vue'
 import { useChatSound } from '../composables/useChatSound'
@@ -13,6 +13,10 @@ const { muted } = useChatSound()
 
 const open = ref(false)
 const activeId = ref<string | null>(null)
+const { activeLot } = storeToRefs(useActiveLotStore())
+
+// Al cambiar de playa se vuelve a la bandeja: la conversación abierta era de la otra playa.
+watch(() => activeLot.value?.id, () => (activeId.value = null))
 const bump = ref(false)
 const root = ref<HTMLElement | null>(null)
 

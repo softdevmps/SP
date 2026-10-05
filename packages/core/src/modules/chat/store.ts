@@ -9,8 +9,15 @@ export interface ConversationSummary extends Conversation {
 }
 
 export const useChatStore = defineStore('chat', () => {
-  const conversations = ref<Conversation[]>([])
+  /** Conversaciones de todas las playas cargadas; la bandeja muestra las de la playa activa. */
+  const allConversations = ref<Conversation[]>([])
   const messages = ref<ChatMessage[]>([])
+  const activeLotId = ref<string | null>(null)
+  const loadedLots = new Set<string>()
+
+  const conversations = computed(() =>
+    allConversations.value.filter((conversation) => conversation.lotId === activeLotId.value),
+  )
   /** Último mensaje que llegó de un conductor, para avisar (sonido, animación). */
   const lastIncoming = ref<ChatMessage | null>(null)
 
@@ -66,7 +73,7 @@ export const useChatStore = defineStore('chat', () => {
   /** Mensaje de la playa al conductor. Solo texto, sin vacíos y con largo máximo. */
   function send(conversationId: string, rawBody: string) {
     const body = rawBody.trim().slice(0, MESSAGE_MAX_LENGTH)
-    const conversation = conversations.value.find((c) => c.id === conversationId)
+    const conversation = allConversations.value.find((c) => c.id === conversationId)
     if (!body || !conversation || conversation.closed) return
 
     const message: ChatMessage = {
@@ -97,10 +104,13 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   function connect(lotId: string) {
-    if (stopFeed) return
-    if (!conversations.value.length) {
-      conversations.value = buildMockConversations(lotId)
-      messages.value = buildMockMessages()
+    if (stopFeed && activeLotId.value === lotId) return
+    disconnect()
+    activeLotId.value = lotId
+    if (!loadedLots.has(lotId)) {
+      loadedLots.add(lotId)
+      allConversations.value.push(...buildMockConversations(lotId))
+      messages.value.push(...buildMockMessages(lotId))
     }
     stopFeed = startMockDriverFeed(() => {
       const open = conversations.value.filter((c) => !c.closed)

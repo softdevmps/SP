@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 import { MessagesSquare, Volume2, VolumeX } from 'lucide-vue-next'
 import { useChatStore } from '@sp/core'
 import PageHeader from '@/components/PageHeader.vue'
+import LotGate from '@/components/LotGate.vue'
 import ConversationList from '@/features/chat/components/ConversationList.vue'
 import ChatThread from '@/features/chat/components/ChatThread.vue'
 import { useChatSound } from '@/features/chat/composables/useChatSound'
@@ -13,11 +14,13 @@ const { muted } = useChatSound()
 
 const activeId = ref<string | null>(null)
 
-// Al entrar se abre la conversación más reciente con mensajes sin leer (o la más reciente).
+// Al entrar (o al cambiar de playa) se abre la conversación con mensajes sin leer, o la más reciente.
 watch(
   summaries,
   (list) => {
-    if (activeId.value || !list.length) return
+    if (activeId.value && list.some((conversation) => conversation.id === activeId.value)) return
+    activeId.value = null
+    if (!list.length) return
     activeId.value = (list.find((c) => c.unread > 0) ?? list[0])?.id ?? null
   },
   { immediate: true },
@@ -40,14 +43,16 @@ const subtitle = computed(() =>
       </template>
     </PageHeader>
 
-    <div class="inbox">
-      <ConversationList class="inbox__list" :active-id="activeId" @select="activeId = $event" />
-      <ChatThread v-if="activeId" :conversation-id="activeId" class="inbox__thread" />
-      <div v-else class="inbox__empty">
-        <MessagesSquare :size="28" />
-        Elegí una conversación
+    <LotGate>
+      <div class="inbox">
+        <ConversationList class="inbox__list" :active-id="activeId" @select="activeId = $event" />
+        <ChatThread v-if="activeId" :conversation-id="activeId" class="inbox__thread" />
+        <div v-else class="inbox__empty">
+          <MessagesSquare :size="28" />
+          Elegí una conversación
+        </div>
       </div>
-    </div>
+    </LotGate>
   </section>
 </template>
 

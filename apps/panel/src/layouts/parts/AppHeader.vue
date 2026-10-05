@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import UserMenu from './UserMenu.vue'
 import HeaderChat from '@/features/chat/components/HeaderChat.vue'
+import LotSwitcher from './LotSwitcher.vue'
 
-defineProps<{ sidebarOpen: boolean; showChat?: boolean }>()
+defineProps<{ sidebarOpen: boolean; showChat?: boolean; showLot?: boolean }>()
 defineEmits<{ toggleSidebar: [] }>()
 </script>
 
@@ -26,6 +27,9 @@ defineEmits<{ toggleSidebar: [] }>()
       <span class="brand__badge">SP</span>
       <span class="brand__name">Smart Parking</span>
     </RouterLink>
+
+    <span v-if="showLot" class="header__divider" aria-hidden="true" />
+    <LotSwitcher v-if="showLot" />
 
     <div class="header__actions">
       <HeaderChat v-if="showChat" />
@@ -140,6 +144,12 @@ defineEmits<{ toggleSidebar: [] }>()
   font-weight: 600;
   font-size: 17px;
   letter-spacing: 0.01em;
+}
+
+.header__divider {
+  width: 1px;
+  height: 24px;
+  background: var(--sp-border-strong);
 }
 
 .header__actions {

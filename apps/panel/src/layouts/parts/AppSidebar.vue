@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ChevronDown } from 'lucide-vue-next'
 import { useAuthStore, useChatStore } from '@sp/core'
 import { navigation, type NavItem } from '../navigation'
+import { activeNavItemTo } from '../activeNavItem'
 
 defineProps<{ open: boolean }>()
 
@@ -23,13 +24,12 @@ function badgeOf(item: NavItem): number {
   return 0
 }
 
-const activeLeafTo = computed(() => {
-  const candidates = visibleSections.value
-    .flatMap((section) => section.items)
-    .filter((item) => !item.children && (route.path === item.to || route.path.startsWith(`${item.to}/`)))
-    .map((item) => item.to)
-  return candidates.sort((a, b) => b.length - a.length)[0] ?? null
-})
+const activeItemTo = computed(() =>
+  activeNavItemTo(
+    route.path,
+    visibleSections.value.flatMap((section) => section.items.map((item) => item.to)),
+  ),
+)
 
 function isWithin(item: NavItem) {
   return route.path === item.to || route.path.startsWith(`${item.to}/`)
@@ -106,7 +106,7 @@ function onParentClick(item: NavItem) {
               v-else
               :to="item.to"
               class="sidebar__link"
-              :class="{ 'is-active': item.to === activeLeafTo }"
+              :class="{ 'is-active': item.to === activeItemTo }"
             >
               <span class="sidebar__icon">
                 <component :is="item.icon" :size="18" :stroke-width="1.8" />

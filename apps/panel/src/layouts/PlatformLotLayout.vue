@@ -16,14 +16,30 @@ watchEffect(() => {
   if (layout) hardware.loadLot(layout, { installed: lot.value.status !== 'onboarding' })
 })
 
-const tabs = computed(() => [
-  { name: 'admin-lot-info', label: 'Información', always: true },
-  { name: 'admin-lot-layout', label: 'Plano' },
-  { name: 'admin-lot-settings', label: 'Tarifas y horarios' },
-  { name: 'admin-lot-devices', label: 'Equipos' },
-  { name: 'admin-lot-sensors', label: 'Sensores' },
-  { name: 'admin-lot-live', label: 'Estado en vivo' },
-].filter((tab) => tab.always || isSubscribed.value))
+// Pestañas agrupadas por tema; una playa no suscripta solo tiene Información.
+const groups = computed(() =>
+  [
+    {
+      label: 'Configuración',
+      tabs: [
+        { name: 'admin-lot-info', label: 'Información', always: true },
+        { name: 'admin-lot-layout', label: 'Plano' },
+        { name: 'admin-lot-settings', label: 'Tarifas y horarios' },
+      ],
+    },
+    {
+      label: 'Hardware',
+      tabs: [
+        { name: 'admin-lot-devices', label: 'Equipos' },
+        { name: 'admin-lot-sensors', label: 'Sensores' },
+        { name: 'admin-lot-live', label: 'Estado en vivo' },
+      ],
+    },
+    { label: 'Operación', tabs: [{ name: 'admin-lot-reservations', label: 'Reservas' }] },
+  ]
+    .map((group) => ({ ...group, tabs: group.tabs.filter((tab) => tab.always || isSubscribed.value) }))
+    .filter((group) => group.tabs.length),
+)
 </script>
 
 <template>
@@ -43,15 +59,20 @@ const tabs = computed(() => [
     </header>
 
     <nav class="tabs" aria-label="Secciones de la playa">
-      <RouterLink
-        v-for="tab in tabs"
-        :key="tab.name"
-        :to="{ name: tab.name, params: { lotId: lot.id } }"
-        class="tab"
-        active-class="is-active"
-      >
-        {{ tab.label }}
-      </RouterLink>
+      <div v-for="group in groups" :key="group.label" class="tabs__group">
+        <span class="tabs__label">{{ group.label }}</span>
+        <div class="tabs__items">
+          <RouterLink
+            v-for="tab in group.tabs"
+            :key="tab.name"
+            :to="{ name: tab.name, params: { lotId: lot.id } }"
+            class="tab"
+            active-class="is-active"
+          >
+            {{ tab.label }}
+          </RouterLink>
+        </div>
+      </div>
     </nav>
 
     <RouterView />
@@ -104,9 +125,33 @@ const tabs = computed(() => [
 
 .tabs {
   display: flex;
-  gap: 4px;
+  gap: 28px;
   overflow-x: auto;
   border-bottom: 1px solid var(--sp-border);
+}
+
+.tabs__group {
+  display: grid;
+  gap: 2px;
+}
+
+.tabs__group + .tabs__group {
+  padding-left: 28px;
+  border-left: 1px solid var(--sp-border);
+}
+
+.tabs__label {
+  padding: 0 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sp-text-faint);
+}
+
+.tabs__items {
+  display: flex;
+  gap: 4px;
 }
 
 .tab {

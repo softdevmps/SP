@@ -14,7 +14,7 @@ export function buildMockConversations(lotId: string): Conversation[] {
     ['c5', 'SP-5V8E', 'Pablo Correa', 'AG 154 DR', true],
   ]
   return rows.map(([id, reservationCode, driverName, vehiclePlate, closed]) => ({
-    id,
+    id: `${lotId}-${id}`,
     lotId,
     reservationId: `res-${reservationCode}`,
     reservationCode,
@@ -24,7 +24,7 @@ export function buildMockConversations(lotId: string): Conversation[] {
   }))
 }
 
-export function buildMockMessages(): ChatMessage[] {
+export function buildMockMessages(lotId: string): ChatMessage[] {
   const rows: Array<[string, 'driver' | 'lot', string, number, number | null]> = [
     ['c1', 'driver', 'Hola, ¿la entrada es por Av. Colón o por la calle de atrás?', 14, null],
     ['c1', 'driver', 'Estoy llegando en 5 minutos.', 12, null],
@@ -37,8 +37,8 @@ export function buildMockMessages(): ChatMessage[] {
     ['c5', 'lot', '¡Gracias a vos, Pablo! Buen viaje.', 148, 140],
   ]
   return rows.map(([conversationId, author, body, sent, read], index) => ({
-    id: `m${index + 1}`,
-    conversationId,
+    id: `${lotId}-m${index + 1}`,
+    conversationId: `${lotId}-${conversationId}`,
     author,
     body,
     sentAt: minutesAgo(sent),

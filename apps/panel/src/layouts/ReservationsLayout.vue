@@ -10,6 +10,7 @@ import ArrivalConfirmDialog from '@/features/reservations/components/ArrivalConf
 import CheckOutDialog from '@/features/reservations/components/CheckOutDialog.vue'
 import { provideReservationActions } from '@/features/reservations/useReservationActions'
 import { useLotLive } from '@/composables/useLotLive'
+import LotGate from '@/components/LotGate.vue'
 
 // Encabezado, buscador de ticket y diálogos son los mismos para Llegadas, En la playa e Historial:
 // cualquier código funciona desde cualquiera de las tres pantallas.
@@ -39,9 +40,10 @@ provideReservationActions({ openArrival, openExit })
       <template #actions><LiveBadge /></template>
     </PageHeader>
 
-    <TicketLookup allow-exit @arrival="openArrival" @exit="openExit" />
-
-    <RouterView />
+    <LotGate>
+      <TicketLookup allow-exit @arrival="openArrival" @exit="openExit" />
+      <RouterView />
+    </LotGate>
 
     <ArrivalConfirmDialog v-model:open="arrivalOpen" :reservation="selected" />
     <CheckOutDialog v-model:open="exitOpen" :reservation="selected" />

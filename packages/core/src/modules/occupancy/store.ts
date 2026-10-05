@@ -2,9 +2,9 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Lot } from '../lots'
 import { calculateOverstay, type Reservation } from '../reservations'
+import { usePlatformStore } from '../platform/store'
 import {
   buildMockEvents,
-  buildMockLot,
   buildMockReservations,
   buildMockSince,
   buildMockSnapshot,
@@ -21,7 +21,21 @@ import type {
 
 const MAX_EVENTS = 50
 
+/** Datos en vivo de una playa (se guardan por playa para poder cambiar de una a otra). */
+interface LotData {
+  lot: Lot
+  snapshot: OccupancySnapshot
+  since: OccupancySince
+  events: OccupancyEvent[]
+  reservations: Reservation[]
+  lastUpdate: Date | null
+}
+
 export const useOccupancyStore = defineStore('occupancy', () => {
+  /** Playa que se está mirando ahora; el resto queda guardada en `cache`. */
+  const activeLotId = ref<string | null>(null)
+  const cache = ref<Record<string, LotData>>({})
+
   const lot = ref<Lot | null>(null)
   const snapshot = ref<OccupancySnapshot>({})
   const since = ref<OccupancySince>({})
@@ -160,12 +174,65 @@ export const useOccupancyStore = defineStore('occupancy', () => {
   }
 
   /**
-   * Carga la playa (una sola vez) y arranca las actualizaciones en vivo. Las distintas
-   * pantallas comparten el mismo estado: salir de una solo pausa el feed.
+   * MOCK: arma los datos de prueba de una playa a partir de su plano (el mismo que edita el admin).
+   * Con backend: GET /api/playero/playas/{id}, /ocupacion y /reservas.
    */
-  function connect() {
-    if (stopFeed) return
-    if (!lot.value) load()
+  function buildLotData(lotId: string): LotData | null {
+    const layout = usePlatformStore().ensureLayout(lotId)
+    if (!layout) return null
+    const snapshot = buildMockSnapshot(layout)
+    const since = buildMockSince(snapshot)
+    return {
+      lot: layout,
+      snapshot,
+      since,
+      events: buildMockEvents(snapshot, since),
+      reservations: buildMockReservations(lotId),
+      lastUpdate: new Date(),
+    }
+  }
+
+  function ensureLotData(lotId: string): LotData | null {
+    if (!cache.value[lotId]) {
+      const data = buildLotData(lotId)
+      if (data) cache.value[lotId] = data
+    }
+    return cache.value[lotId] ?? null
+  }
+
+  /** Guarda el estado de la playa activa y carga el de otra. */
+  function activate(lotId: string) {
+    if (activeLotId.value === lotId && lot.value) return
+    if (activeLotId.value && lot.value) {
+      cache.value[activeLotId.value] = {
+        lot: lot.value,
+        snapshot: snapshot.value,
+        since: since.value,
+        events: events.value,
+        reservations: reservations.value,
+        lastUpdate: lastUpdate.value,
+      }
+    }
+    const data = ensureLotData(lotId)
+    activeLotId.value = lotId
+    lot.value = data?.lot ?? null
+    snapshot.value = data?.snapshot ?? {}
+    since.value = data?.since ?? {}
+    events.value = data?.events ?? []
+    reservations.value = data?.reservations ?? []
+    lastUpdate.value = data?.lastUpdate ?? null
+    lastChangedSpaceId.value = null
+  }
+
+  /**
+   * Carga la playa (si hace falta) y arranca las actualizaciones en vivo. Las pantallas de la
+   * playa comparten este estado: salir de una solo pausa el feed; cambiar de playa lo reinicia.
+   */
+  function connect(lotId: string) {
+    if (stopFeed && activeLotId.value === lotId) return
+    disconnect()
+    activate(lotId)
+    if (!lot.value) return
     now.value = Date.now()
     clockTimer = setInterval(() => (now.value = Date.now()), 15_000)
 
@@ -182,13 +249,13 @@ export const useOccupancyStore = defineStore('occupancy', () => {
     })
   }
 
-  function load() {
-    lot.value = buildMockLot()
-    snapshot.value = buildMockSnapshot(lot.value)
-    since.value = buildMockSince(snapshot.value)
-    events.value = buildMockEvents(snapshot.value, since.value)
-    reservations.value = buildMockReservations(lot.value.id)
-    lastUpdate.value = new Date()
+  /** Reservas del día de cualquier playa (el admin las consulta en la ficha, solo lectura). */
+  function reservationsFor(lotId: string): Reservation[] {
+    // Una playa en instalación todavía no recibe reservas.
+    const status = usePlatformStore().lots.find((candidate) => candidate.id === lotId)?.status
+    if (status !== 'active' && status !== 'suspended') return []
+    if (lotId === activeLotId.value) return reservations.value
+    return ensureLotData(lotId)?.reservations ?? []
   }
 
   function disconnect() {
@@ -219,7 +286,9 @@ export const useOccupancyStore = defineStore('occupancy', () => {
     reservations,
     lastUpdate,
     lastChangedSpaceId,
+    activeLotId,
     connect,
     disconnect,
+    reservationsFor,
   }
 })

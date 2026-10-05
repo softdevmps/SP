@@ -147,7 +147,8 @@ function ariaSort(column: DataTableColumn<T>) {
       </table>
     </div>
 
-    <footer class="footer">
+    <!-- Con pocas filas (una sola página de las más chicas) el pie no aporta: se oculta. -->
+    <footer v-if="sortedRows.length > PAGE_SIZES[0]!" class="footer">
       <span class="footer__range">{{ rangeLabel }}</span>
 
       <div class="footer__controls">

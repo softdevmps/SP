@@ -42,8 +42,9 @@ export function buildMockSnapshot(lot: Lot): OccupancySnapshot {
       }
     }
   })
-  snapshot.s17 = 'fault'
-  snapshot.s93 = 'fault'
+  // Fallas de ejemplo de Playa Centro (las mismas que ve el admin en Sensores).
+  if ('s17' in snapshot) snapshot.s17 = 'fault'
+  if ('s93' in snapshot) snapshot.s93 = 'fault'
   return snapshot
 }
 

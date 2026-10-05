@@ -16,13 +16,7 @@ const { payments, pendingByLot } = storeToRefs(usePaymentsStore())
 
 const count = (status: string) => lots.value.filter((lot) => lot.status === status).length
 
-const lotStats = computed(() => [
-  { label: 'Playas activas', value: count('active'), tone: 'success' },
-  { label: 'En instalación', value: count('onboarding') },
-  { label: 'Suspendidas', value: count('suspended'), tone: count('suspended') ? 'danger' : '' },
-  { label: 'No suscriptas en el mapa', value: count('not_subscribed') },
-])
-
+// Cuatro números clave; el detalle está en cada sección del menú.
 const operation = computed(() => {
   const active = lots.value.filter((lot) => lot.status === 'active')
   const spaces = active.reduce((sum, lot) => sum + lot.totalSpaces, 0)
@@ -31,11 +25,15 @@ const operation = computed(() => {
   const collectedToday = payments.value
     .filter((p) => p.status === 'approved' && new Date(p.createdAt).getTime() >= today)
     .reduce((sum, p) => sum + p.amount, 0)
+  const others = [
+    count('onboarding') && `${count('onboarding')} en instalación`,
+    count('suspended') && `${count('suspended')} suspendida${count('suspended') > 1 ? 's' : ''}`,
+  ].filter(Boolean)
   return [
-    { label: 'Cocheras con sensores', value: spaces.toLocaleString('es-AR') },
-    { label: 'Ocupación ahora', value: spaces ? `${Math.round((occupied / spaces) * 100)}%` : '—' },
-    { label: 'Reservas hoy', value: active.reduce((sum, lot) => sum + (lot.reservationsToday ?? 0), 0).toLocaleString('es-AR') },
-    { label: 'Cobrado hoy', value: formatMoney(collectedToday) },
+    { label: 'Playas activas', value: String(active.length), detail: others.join(' · ') || 'Todas operando', tone: 'success' },
+    { label: 'Ocupación ahora', value: spaces ? `${Math.round((occupied / spaces) * 100)}%` : '—', detail: `${spaces.toLocaleString('es-AR')} cocheras con sensores` },
+    { label: 'Reservas hoy', value: active.reduce((sum, lot) => sum + (lot.reservationsToday ?? 0), 0).toLocaleString('es-AR'), detail: 'En playas activas' },
+    { label: 'Cobrado hoy', value: formatMoney(collectedToday), detail: 'Pagos aprobados' },
   ]
 })
 
@@ -59,15 +57,10 @@ const onboarding = computed(() => lots.value.filter((lot) => lot.status === 'onb
     <PageHeader title="Resumen" subtitle="Toda la plataforma de un vistazo" />
 
     <dl class="stats">
-      <div v-for="stat in lotStats" :key="stat.label" class="stat" :class="stat.tone && `is-${stat.tone}`">
+      <div v-for="stat in operation" :key="stat.label" class="stat" :class="stat.tone && `is-${stat.tone}`">
         <dt>{{ stat.label }}</dt>
         <dd>{{ stat.value }}</dd>
-      </div>
-    </dl>
-    <dl class="stats">
-      <div v-for="stat in operation" :key="stat.label" class="stat">
-        <dt>{{ stat.label }}</dt>
-        <dd>{{ stat.value }}</dd>
+        <span>{{ stat.detail }}</span>
       </div>
     </dl>
 
@@ -161,12 +154,15 @@ const onboarding = computed(() => lots.value.filter((lot) => lot.status === 'onb
   font-variant-numeric: tabular-nums;
 }
 
-.stat.is-success dd {
-  color: var(--sp-free);
+.stat > span {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--sp-text-muted);
 }
 
-.stat.is-danger dd {
-  color: #f08a8d;
+.stat.is-success dd {
+  color: var(--sp-free);
 }
 
 .row {

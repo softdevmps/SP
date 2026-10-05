@@ -12,7 +12,8 @@ const { isOpen, isDesktop, toggle, closeOverlay } = useSidebar()
 const route = useRoute()
 const auth = useAuthStore()
 
-// El chat con conductores es de la playa: lo usan playeros y dueños, no el admin de plataforma.
+// El chat y la playa activa son de la operación de una playa: los usan playeros y dueños, no el
+// admin de plataforma.
 const hasChat = computed(() => auth.user?.role === 'attendant' || auth.user?.role === 'owner')
 if (hasChat.value) useChatLive()
 
@@ -29,7 +30,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 
 <template>
   <div class="panel" :class="{ 'is-pushed': isOpen && isDesktop }">
-    <AppHeader :sidebar-open="isOpen" :show-chat="hasChat" @toggle-sidebar="toggle" />
+    <AppHeader :sidebar-open="isOpen" :show-chat="hasChat" :show-lot="hasChat" @toggle-sidebar="toggle" />
     <AppSidebar :open="isOpen" />
 
     <Transition name="backdrop">
